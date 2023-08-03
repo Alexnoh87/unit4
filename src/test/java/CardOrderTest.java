@@ -15,103 +15,116 @@ import static com.codeborne.selenide.Selenide.*;
 
 
 public class CardOrderTest {
-    public String Date(int days) {
+    public String planningDate(int days) {
         return LocalDate.now().plusDays(days).format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
     }
 
     @BeforeEach
     void openBrowser() {
         open("http://localhost:9999/");
-        $("[data-test-id='date'] input").doubleClick().sendKeys(Keys.DELETE);
+        $("[data-test-id='date'] input").sendKeys(Keys.chord(Keys.SHIFT, Keys.HOME), Keys.BACK_SPACE);
     }
 
     //Задача №1
     @Test
     void testValid() {
         $("[data-test-id='city'] input").setValue("Казань");
-        $("[data-test-id='date'] input").setValue(Date(3));
+        $("[data-test-id='date'] input").setValue(planningDate(3));
         $("[data-test-id='name'] input").setValue("Иван Петров");
         $("[data-test-id='phone'] input").setValue("+79000000000");
         $("[data-test-id='agreement']").click();
         $(byClassName ("button")).click();
         $(withText("Успешно!")).shouldBe(visible, Duration.ofSeconds(15));
+        $("[data-test-id='notification'].notification .notification__content")
+                .shouldHave(text("Встреча успешно забронирована на " + planningDate(3))).shouldBe(visible);
     }
 
     @Test
     void testNameSpace() {
         $("[data-test-id='city'] input").setValue("Казань");
-        $("[data-test-id='date'] input").setValue(Date(3));
+        $("[data-test-id='date'] input").setValue(planningDate(4));
         $("[data-test-id='name'] input").setValue("Иван Ван Петров");
         $("[data-test-id='phone'] input").setValue("+79000000000");
         $("[data-test-id='agreement']").click();
         $(byClassName ("button")).click();
         $(withText("Успешно!")).shouldBe(visible, Duration.ofSeconds(15));
+        $("[data-test-id='notification'].notification .notification__content")
+                .shouldHave(text("Встреча успешно забронирована на " + planningDate(4))).shouldBe(visible);
     }
 
     @Test
     void testNameHyphen() {
         $("[data-test-id='city'] input").setValue("Казань");
-        $("[data-test-id='date'] input").setValue(Date(3));
+        $("[data-test-id='date'] input").setValue(planningDate(3));
         $("[data-test-id='name'] input").setValue("Иван-Ван Петров");
         $("[data-test-id='phone'] input").setValue("+79000000000");
         $("[data-test-id='agreement']").click();
         $(byClassName ("button")).click();
         $(withText("Успешно!")).shouldBe(visible, Duration.ofSeconds(15));
+        $("[data-test-id='notification'].notification .notification__content")
+                .shouldHave(text("Встреча успешно забронирована на " + planningDate(3))).shouldBe(visible);
     }
 
     @Test
     void testLastNameHyphen() {
         $("[data-test-id='city'] input").setValue("Казань");
-        $("[data-test-id='date'] input").setValue(Date(3));
+        $("[data-test-id='date'] input").setValue(planningDate(3));
         $("[data-test-id='name'] input").setValue("Иван Петров-Старший");
         $("[data-test-id='phone'] input").setValue("+79000000000");
         $("[data-test-id='agreement']").click();
         $(byClassName ("button")).click();
         $(withText("Успешно!")).shouldBe(visible, Duration.ofSeconds(15));
+        $("[data-test-id='notification'].notification .notification__content")
+                .shouldHave(text("Встреча успешно забронирована на " + planningDate(3))).shouldBe(visible);
     }
 
     @Test
     void testCityHyphen() {
         $("[data-test-id='city'] input").setValue("Санкт-Петербург");
-        $("[data-test-id='date'] input").setValue(Date(3));
+        $("[data-test-id='date'] input").setValue(planningDate(3));
         $("[data-test-id='name'] input").setValue("Иван Петров");
         $("[data-test-id='phone'] input").setValue("+79000000000");
         $("[data-test-id='agreement']").click();
         $(byClassName ("button")).click();
         $(withText("Успешно!")).shouldBe(visible, Duration.ofSeconds(15));
+        $("[data-test-id='notification'].notification .notification__content")
+                .shouldHave(text("Встреча успешно забронирована на " + planningDate(3))).shouldBe(visible);
     }
 
     @Test
     void testCityNotSubject() {
         $("[data-test-id='city'] input").setValue("Чукотка");
-        $("[data-test-id='date'] input").setValue(Date(3));
+        $("[data-test-id='date'] input").setValue(planningDate(3));
         $("[data-test-id='name'] input").setValue("Иван Петров");
         $("[data-test-id='phone'] input").setValue("+79000000000");
         $("[data-test-id='agreement']").click();
         $(byClassName ("button")).click();
-        $("[data-test-id='city'].input_invalid .input__sub").shouldHave(exactText("Доставка в выбранный город недоступна"));
+        $("[data-test-id='city'].input_invalid .input__sub")
+                .shouldHave(exactText("Доставка в выбранный город недоступна"));
     }
 
     @Test
     void testEmptyCity() {
         $("[data-test-id='city'] input").setValue("");
-        $("[data-test-id='date'] input").setValue(Date(3));
+        $("[data-test-id='date'] input").setValue(planningDate(3));
         $("[data-test-id='name'] input").setValue("Иван Петров");
         $("[data-test-id='phone'] input").setValue("+79000000000");
         $("[data-test-id='agreement']").click();
         $(byClassName ("button")).click();
-        $("[data-test-id='city'].input_invalid .input__sub").shouldHave(exactText("Поле обязательно для заполнения"));
+        $("[data-test-id='city'].input_invalid .input__sub")
+                .shouldHave(exactText("Поле обязательно для заполнения"));
     }
 
     @Test
     void testWrongDate() {
         $("[data-test-id='city'] input").setValue("Казань");
-        $("[data-test-id='date'] input").setValue(Date(2));
+        $("[data-test-id='date'] input").setValue(planningDate(2));
         $("[data-test-id='name'] input").setValue("Иван Петров");
         $("[data-test-id='phone'] input").setValue("+79000000000");
         $("[data-test-id='agreement']").click();
         $(byClassName ("button")).click();
-        $("[data-test-id='date'].calendar-input .input__sub").shouldHave(exactText("Заказ на выбранную дату невозможен"));
+        $("[data-test-id='date'].calendar-input .input__sub")
+                .shouldHave(exactText("Заказ на выбранную дату невозможен"));
     }
 
     @Test
@@ -128,66 +141,72 @@ public class CardOrderTest {
     @Test
     void testLatinName() {
         $("[data-test-id='city'] input").setValue("Казань");
-        $("[data-test-id='date'] input").setValue(Date(3));
+        $("[data-test-id='date'] input").setValue(planningDate(3));
         $("[data-test-id='name'] input").setValue("Ivan Petrov");
         $("[data-test-id='phone'] input").setValue("+79000000000");
         $("[data-test-id='agreement']").click();
         $(byClassName ("button")).click();
-        $("[data-test-id='name'].input_invalid .input__sub").shouldHave(exactText("Имя и Фамилия указаные неверно. Допустимы только русские буквы, пробелы и дефисы."));
+        $("[data-test-id='name'].input_invalid .input__sub")
+                .shouldHave(exactText("Имя и Фамилия указаные неверно. Допустимы только русские буквы, пробелы и дефисы."));
     }
 
     @Test
     void testEmptyName() {
         $("[data-test-id='city'] input").setValue("Казань");
-        $("[data-test-id='date'] input").setValue(Date(3));
+        $("[data-test-id='date'] input").setValue(planningDate(3));
         $("[data-test-id='name'] input").setValue("");
         $("[data-test-id='phone'] input").setValue("+79000000000");
         $("[data-test-id='agreement']").click();
         $(byClassName ("button")).click();
-        $("[data-test-id='name'].input_invalid .input__sub").shouldHave(exactText("Поле обязательно для заполнения"));
+        $("[data-test-id='name'].input_invalid .input__sub")
+                .shouldHave(exactText("Поле обязательно для заполнения"));
     }
 
     @Test
     void testPhone10() {
         $("[data-test-id='city'] input").setValue("Казань");
-        $("[data-test-id='date'] input").setValue(Date(3));
+        $("[data-test-id='date'] input").setValue(planningDate(3));
         $("[data-test-id='name'] input").setValue("Иван Петров");
         $("[data-test-id='phone'] input").setValue("+7900000000");
         $("[data-test-id='agreement']").click();
         $(byClassName ("button")).click();
-        $("[data-test-id='phone'].input_invalid .input__sub").shouldHave(exactText("Телефон указан неверно. Должно быть 11 цифр, например, +79012345678."));
+        $("[data-test-id='phone'].input_invalid .input__sub")
+                .shouldHave(exactText("Телефон указан неверно. Должно быть 11 цифр, например, +79012345678."));
     }
 
     @Test
     void testPhone12() {
         $("[data-test-id='city'] input").setValue("Казань");
-        $("[data-test-id='date'] input").setValue(Date(3));
+        $("[data-test-id='date'] input").setValue(planningDate(3));
         $("[data-test-id='name'] input").setValue("Иван Петров");
         $("[data-test-id='phone'] input").setValue("+790000000000");
         $("[data-test-id='agreement']").click();
         $(byClassName ("button")).click();
-        $("[data-test-id='phone'].input_invalid .input__sub").shouldHave(exactText("Телефон указан неверно. Должно быть 11 цифр, например, +79012345678."));
+        $("[data-test-id='phone'].input_invalid .input__sub")
+                .shouldHave(exactText("Телефон указан неверно. Должно быть 11 цифр, например, +79012345678."));
     }
 
     @Test
     void testEmptyPhone() {
         $("[data-test-id='city'] input").setValue("Казань");
-        $("[data-test-id='date'] input").setValue(Date(3));
+        $("[data-test-id='date'] input").setValue(planningDate(3));
         $("[data-test-id='name'] input").setValue("Иван Петров");
         $("[data-test-id='phone'] input").setValue("");
         $("[data-test-id='agreement']").click();
         $(byClassName ("button")).click();
-        $("[data-test-id='phone'].input_invalid .input__sub").shouldHave(exactText("Поле обязательно для заполнения"));
+        $("[data-test-id='phone'].input_invalid .input__sub")
+                .shouldHave(exactText("Поле обязательно для заполнения"));
     }
 
     @Test
     void testWithoutCheckbox() {
         $("[data-test-id='city'] input").setValue("Казань");
-        $("[data-test-id='date'] input").setValue(Date(3));
+        $("[data-test-id='date'] input").setValue(planningDate(3));
         $("[data-test-id='name'] input").setValue("Иван Петров");
         $("[data-test-id='phone'] input").setValue("+79000000000");
         $(byClassName ("button")).click();
-        $("[data-test-id=agreement].input_invalid .checkbox__text").shouldHave(exactText("Я соглашаюсь с условиями обработки и использования моих персональных данных"));
+        $("[data-test-id=agreement].input_invalid .checkbox__text")
+                .shouldHave(exactText("Я соглашаюсь с условиями обработки и использования моих персональных данных"));
     }
 
     //Задача №2
@@ -196,12 +215,14 @@ public class CardOrderTest {
         $("[data-test-id='city'] input").setValue("Пе");
         ElementsCollection CityList = $$("[class='popup__container'] span");
         CityList.findBy(text("Пермь")).click();
-        $("[data-test-id='date'] input").setValue(Date(3));
+        $("[data-test-id='date'] input").setValue(planningDate(3));
         $("[data-test-id='name'] input").setValue("Иван Петров");
         $("[data-test-id='phone'] input").setValue("+79000000000");
         $("[data-test-id='agreement']").click();
         $(byClassName ("button")).click();
         $(withText("Успешно!")).shouldBe(visible, Duration.ofSeconds(15));
+        $("[data-test-id='notification'].notification .notification__content")
+                .shouldHave(text("Встреча успешно забронирована на " + planningDate(3))).shouldBe(visible);
     }
 
     @Test
@@ -224,5 +245,7 @@ public class CardOrderTest {
         $("[data-test-id='agreement']").click();
         $(byClassName ("button")).click();
         $(withText("Успешно!")).shouldBe(visible, Duration.ofSeconds(15));
+        $("[data-test-id='notification'].notification .notification__content")
+                .shouldHave(text("Встреча успешно забронирована на " + planningDate(days + 3))).shouldBe(visible);
     }
 }

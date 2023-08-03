@@ -229,16 +229,16 @@ public class CardOrderTest {
     void testCalendar() {
         $("[data-test-id='city'] input").setValue("Казань");
         $("[data-test-id='date'] input").click();
-        ElementsCollection Date = $$("[class='popup__container'] [data-day]");
+        ElementsCollection date = $$("[class='popup__container'] [data-day]");
         int days = 14 - 3;
         int daysNextMonth;
-        int currentWeek = Date.size();
+        int currentWeek = date.size();
         if (currentWeek < days) {
             daysNextMonth = days - currentWeek;
             $("[class='popup__container'] [data-step='1']").click();
-            Date.get(daysNextMonth).click();
+            date.get(daysNextMonth).click();
         } else {
-            Date.get(days).click();
+            date.get(days).click();
         }
         $("[data-test-id='name'] input").setValue("Иван Петров");
         $("[data-test-id='phone'] input").setValue("+79000000000");
